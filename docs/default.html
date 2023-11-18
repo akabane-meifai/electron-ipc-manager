@@ -1,0 +1,20 @@
+<!DOCYPE html>
+<html>
+<head>
+<title>Application</title>
+<script type="text/javascript">
+IPCPromise.applicationMenu([
+	{
+		label: 'Application',
+		submenu: [
+			{ role: 'quit' },
+			{ role: 'toggleDevTools' }
+		]
+	}
+]).then(() => {});
+</script>
+</head>
+<body>
+Hello chromium.
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCYPE html>
+<html>
+<head>
+<title>Application</title>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(){
+	let path = null;
+	const redirect = () => {
+		if(path != null){
+			location.replace(path);
+		}
+	};
+	IPCPromise.file((info, it, success) => {
+		if(info.exists){
+			path = `file:///${info.filename}`;
+		}
+		it.next();
+	}, "%data%/index.html").then(redirect, redirect);
+});
+</script>
+</head>
+<body>
+</body>
+</html>
