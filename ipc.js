@@ -33,19 +33,19 @@ const pathInfo = (arg) => {
 	if(exists){
 		const {uid: fuid, gid: fgid, mode} = fs.statSync(filename);
 		readable = (
-			((fuid == uid) && ((mode & fs.constants.S_IRUSR) != 0)) ||
-			((fgid == gid) && ((mode & fs.constants.S_IRGRP) != 0)) ||
-			(                  (mode & fs.constants.S_IROTH) != 0 )
+			((fuid == uid) && ((mode & 0o400) != 0)) ||
+			((fgid == gid) && ((mode & 0o040) != 0)) ||
+			(                  (mode & 0o004) != 0 )
 		);
 		writable = (
-			((fuid == uid) && ((mode & fs.constants.S_IWUSR) != 0)) ||
-			((fgid == gid) && ((mode & fs.constants.S_IWGRP) != 0)) ||
-			(                  (mode & fs.constants.S_IWOTH) != 0 )
+			((fuid == uid) && ((mode & 0o200) != 0)) ||
+			((fgid == gid) && ((mode & 0o020) != 0)) ||
+			(                  (mode & 0o002) != 0 )
 		);
 		executable = (
-			((fuid == uid) && ((mode & fs.constants.S_IXUSR) != 0)) ||
-			((fgid == gid) && ((mode & fs.constants.S_IXGRP) != 0)) ||
-			(                  (mode & fs.constants.S_IXOTH) != 0 )
+			((fuid == uid) && ((mode & 0o100) != 0)) ||
+			((fgid == gid) && ((mode & 0o010) != 0)) ||
+			(                  (mode & 0o001) != 0 )
 		);
 	}
 	return {filename, exists, readable, writable, executable};
@@ -60,7 +60,17 @@ module.exports = {
 	*file(filename){
 		const info = pathInfo(filename);
 		try{
-			yield info;
+			const args = yield info;
+			if(args.length == 0){
+				return null;
+			}
+			const proc = args.shift();
+			if(proc == "read"){
+				return (info.readable) ? fs.readFileSync(info.filename, ...args) : null;
+			}
+			if(proc == "dir"){
+				return (info.readable) ? fs.readdirSync(info.filename).map(name => path.join(info.filename, name)) : null;
+			}
 		}catch(ex){}
 		return null;
 	},
